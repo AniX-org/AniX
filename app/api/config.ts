@@ -3,7 +3,8 @@ export const CURRENT_APP_VERSION = "3.10.3";
 export const API_URL = "https://api-s.anixsekai.com";
 export const ANILIBRIA_API_URL = process.env.NEXT_PUBLIC_ANILIBRIA_API_URL || "https://anilibria.top";
 export const TORAPI_API_URL = process.env.NEXT_PUBLIC_TORAPI_API_URL || "https://torapi.vercel.app";
-export const API_PREFIX = process.env.NEXT_PUBLIC_API_URL || "/api/proxy";
+export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || "";
+export const API_PREFIX = process.env.NEXT_PUBLIC_API_URL || `${BASE_PATH}/api/proxy`;
 export const SHARE_PREFIX = process.env.NEXT_PUBLIC_SHARE_PREFIX || "https://anixart-app.com";
 export const USER_AGENT =
   "AnixartApp/9.0 BETA 5-25062213 (Android 9; SDK 28; arm64-v8a; samsung SM-G975N; en)";

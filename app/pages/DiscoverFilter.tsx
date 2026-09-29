@@ -1,6 +1,6 @@
 "use client";
 
-import { ENDPOINTS } from "#/api/config";
+import { BASE_PATH, ENDPOINTS } from "#/api/config";
 import { FilterDefault, tryCatchAPI } from "#/api/utils";
 import { FiltersModal } from "#/components/Discovery/Modal/FiltersModal";
 import { FloatingToolbar } from "#/components/FloatingToolbar/FloatingToolbar";
@@ -60,7 +60,10 @@ export const DiscoverFilterPage = () => {
 
   useEffect(() => {
     setContent(null);
-    const url = new URL(`/discovery/filter`, window.location.origin);
+    const url = new URL(
+      `${BASE_PATH}/discovery/filter`,
+      window.location.origin
+    );
     url.searchParams.set("filter", JSON.stringify(filter));
     router.replace(url.toString());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -92,7 +95,6 @@ export const DiscoverFilterPage = () => {
       }
       setContent(_content);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const scrollPosition = useScrollPosition();

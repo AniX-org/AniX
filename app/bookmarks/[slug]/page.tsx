@@ -10,15 +10,17 @@ const SectionTitleMapping = {
 };
 
 export async function generateMetadata({ params }) {
+  const { slug } = await params;
   return {
-    title: SectionTitleMapping[params.slug],
+    title: SectionTitleMapping[slug],
   };
 }
 
-export default function Index({ params }) {
+export default async function Index({ params }) {
+  const { slug } = await params;
   return (
     <BookmarksCategoryPage
-      slug={params.slug}
+      slug={slug}
       SectionTitleMapping={SectionTitleMapping}
     />
   );

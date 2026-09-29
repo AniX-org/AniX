@@ -9,7 +9,7 @@ const _getData = async (url: string) => {
 }
 
 export async function generateMetadata({ params }, parent: ResolvingMetadata): Promise<Metadata> {
-  const id:string = params.id;
+  const { id } = await params;
   const previousOG = (await parent).openGraph;
 
   const [ related, relatedError ] = await _getData(`${API_URL}/related/${id}/0`);
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }, parent: ResolvingMetadata): P
 }
 
 export default async function Related({ params }) {
-  const id: string = params.id;
+  const { id } = await params;
   const [ related, relatedError ] = await _getData(`${API_URL}/related/${id}/0`);
   if (relatedError || related.content.length == 0) {
     return <main className="flex items-center justify-center min-h-screen">

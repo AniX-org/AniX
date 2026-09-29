@@ -7,7 +7,7 @@ export async function generateMetadata(
   { params },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id: string = params.id;
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
     `${API_URL}/profile/${id}`
   );
@@ -31,6 +31,7 @@ export async function generateMetadata(
   };
 }
 
-export default function Index({ params }) {
-  return <BookmarksPage profile_id={params.id} />;
+export default async function Index({ params }) {
+  const { id } = await params;
+  return <BookmarksPage profile_id={id} />;
 }

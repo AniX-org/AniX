@@ -94,7 +94,6 @@ export const VoiceoverSelectorMenu = ({
                             )}
                         </div>
                         <div className="flex gap-2">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <span>{vo.episodes_count} {numberDeclension(vo.episodes_count, "серия", "серии", "серий")}</span>
                             <span>{vo.view_count} {numberDeclension(vo.view_count, "просмотр", "просмотра", "просмотров")}</span>
                         </div>

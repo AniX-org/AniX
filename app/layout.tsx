@@ -2,6 +2,7 @@ import "./globals.css";
 import { App } from "./App";
 import { ThemeModeScript } from "flowbite-react";
 import { ThemeInit } from "../.flowbite-react/init";
+import { BASE_PATH } from "./api/config";
 
 export const metadata = {
   metadataBase: new URL(process.env.METADATA_BASE_URL || "https://example.com"),
@@ -21,7 +22,7 @@ export const metadata = {
     url: process.env.METADATA_BASE_URL || "https://example.com",
     images: [
       {
-        url: "/opengraph.png", // Must be an absolute URL
+        url: `${BASE_PATH}/opengraph.png`,
         width: 800,
         height: 600,
       },

@@ -4,6 +4,7 @@ import { Modal, ModalBody, ModalHeader } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { tryCatch } from "#/api/utils";
 import { ChangelogAccordion, ChangelogMarkdown } from "./Changelog";
+import { BASE_PATH } from "#/api/config";
 
 export const ChangelogModal = (props: {
   isOpen: boolean;
@@ -20,7 +21,9 @@ export const ChangelogModal = (props: {
   >({});
 
   async function _fetchVersionChangelog(filename: string) {
-    const { data, error } = await tryCatch(fetch(`/changelog/${filename}`));
+    const { data, error } = await tryCatch(
+      fetch(`${BASE_PATH}/changelog/${filename}`)
+    );
     if (error) {
       return "Нет списка изменений";
     }
@@ -67,7 +70,7 @@ export const ChangelogModal = (props: {
   }
 
   return (
-    <Modal show={props.isOpen} onClose={() => props.setIsOpen(false)}>
+    <Modal dismissible show={props.isOpen} onClose={() => props.setIsOpen(false)}>
       <ModalHeader>
         Список изменений v{props.versionResponse.version}
       </ModalHeader>

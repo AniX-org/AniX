@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 
 import { Dropdown, DropdownItem } from "flowbite-react";
 import { useUserStore } from "#/store/auth";
-import { ENDPOINTS } from "#/api/config";
+import { BASE_PATH, ENDPOINTS } from "#/api/config";
 import { tryCatchAPI } from "#/api/utils";
 import useSWRInfinite from "swr/infinite";
 import { Spinner } from "#/components/Spinner/Spinner";
@@ -169,7 +169,7 @@ export function SearchPage() {
   useEffect(() => {
     if (!params) return;
 
-    const url = new URL(`/search`, window.location.origin);
+    const url = new URL(`${BASE_PATH}/search`, window.location.origin);
     url.searchParams.set("query", query);
     url.searchParams.set("params", JSON.stringify(params));
     router.replace(url.toString());
@@ -180,7 +180,7 @@ export function SearchPage() {
   useEffect(() => {
     setContent(null);
 
-    const url = new URL(`/search`, window.location.origin);
+    const url = new URL(`${BASE_PATH}/search`, window.location.origin);
     url.searchParams.set("query", query);
     url.searchParams.set("params", JSON.stringify(params));
     router.replace(url.toString());

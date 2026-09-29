@@ -7,7 +7,7 @@ export async function generateMetadata(
   { params },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
     `${API_URL}/release/${id}`
   );
@@ -33,8 +33,9 @@ export async function generateMetadata(
 }
 
 export default async function Collections({ params }) {
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
-    `${API_URL}/release/${params.id}`
+    `${API_URL}/release/${id}`
   );
 
   if (error) {
@@ -53,7 +54,7 @@ export default async function Collections({ params }) {
     <CollectionsFullPage
       type="release"
       title={data.release.title_ru + " в коллекциях"}
-      release_id={params.id}
+      release_id={id}
     />
   );
 }

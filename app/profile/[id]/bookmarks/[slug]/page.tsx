@@ -15,7 +15,7 @@ export async function generateMetadata(
   { params },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id: string = params.id;
+  const { id, slug } = await params;
   const { data, error } = await fetchDataViaGet(
     `${API_URL}/profile/${id}`
   );
@@ -29,22 +29,23 @@ export async function generateMetadata(
   };
 
   return {
-    title:"Закладки Пользователя - " + data.profile.login + " - " + SectionTitleMapping[params.slug],
-    description: "Закладки Пользователя - " + data.profile.login + " - " + SectionTitleMapping[params.slug],
+    title:"Закладки Пользователя - " + data.profile.login + " - " + SectionTitleMapping[slug],
+    description: "Закладки Пользователя - " + data.profile.login + " - " + SectionTitleMapping[slug],
     openGraph: {
       ...previousOG,
-      url: `${process.env.METADATA_BASE_URL || "https://example.com"}/profile/${id}/bookmarks/${params.slug}`,
+      url: `${process.env.METADATA_BASE_URL || "https://example.com"}/profile/${id}/bookmarks/${slug}`,
       images: [],
     },
   };
 }
 
-export default function Index({ params }) {
+export default async function Index({ params }) {
+  const { id, slug } = await params;
   return (
     <BookmarksCategoryPage
-      slug={params.slug}
+      slug={slug}
       SectionTitleMapping={SectionTitleMapping}
-      profile_id={params.id}
+      profile_id={id}
     />
   );
 }

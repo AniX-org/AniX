@@ -1,11 +1,9 @@
-"use server";
-
 import { Card } from "flowbite-react";
 import Image from "next/image";
 
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { CURRENT_APP_VERSION } from "#/api/config";
+import { BASE_PATH, CURRENT_APP_VERSION } from "#/api/config";
 import Link from "next/link";
 import {
   ChangelogAccordion,
@@ -35,7 +33,7 @@ export const AboutPage = () => {
           <div>
             <div className="flex flex-row items-center gap-4">
               <Image
-                src="/images/icons/icon-512x512.png"
+                src={`${BASE_PATH}/images/icons/icon-512x512.png`}
                 className="flex-shrink-0 w-16 h-16 rounded-full"
                 alt="about image"
                 width={128}
@@ -96,7 +94,7 @@ export const AboutPage = () => {
                   className="flex items-center gap-3 bg-[#191919] hover:bg-[#303030] text-white transition-colors px-4 py-2 rounded-lg"
                 >
                   <Image
-                    src={"/svg/donationAlert.svg"}
+                    src={`${BASE_PATH}/svg/donationAlert.svg`}
                     alt=""
                     width={16}
                     height={16}
@@ -109,7 +107,7 @@ export const AboutPage = () => {
                   className="flex items-center gap-3 bg-[#191919] hover:bg-[#303030] text-white transition-colors px-4 py-2 rounded-lg"
                 >
                   <Image
-                    src={"/svg/boosty.svg"}
+                    src={`${BASE_PATH}/svg/boosty.svg`}
                     alt=""
                     width={20}
                     height={20}

@@ -7,7 +7,7 @@ export async function generateMetadata(
   { params },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id: string = params.id;
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
     `${API_URL}/profile/${id}`
   );
@@ -32,8 +32,9 @@ export async function generateMetadata(
 };
 
 export default async function Collections({ params }) {
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
-    `${API_URL}/profile/${params.id}`
+    `${API_URL}/profile/${id}`
   );
 
   if (error) {
@@ -54,7 +55,7 @@ export default async function Collections({ params }) {
     <CollectionsFullPage
       type="profile"
       title={`Коллекции пользователя: ${data.profile.login}`}
-      profile_id={params.id}
+      profile_id={id}
     />
   );
 };
