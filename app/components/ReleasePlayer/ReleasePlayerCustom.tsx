@@ -46,6 +46,8 @@ import {
 } from "./ReleasePlayer";
 import { usePreferencesStore } from "#/store/preferences";
 
+type QualityPreference = number | "auto";
+
 const VideoElement = ({
   type,
   src,
@@ -53,6 +55,8 @@ const VideoElement = ({
   defaultPlaybackRate,
   setDefaultPlaybackRate,
   uuid,
+  quality,
+  setQuality,
 }: {
   type: "hls" | "mp4" | null;
   src: string | null;
@@ -60,6 +64,8 @@ const VideoElement = ({
   defaultPlaybackRate: number;
   setDefaultPlaybackRate: (state: number) => void;
   uuid: string;
+  quality: QualityPreference;
+  setQuality: (state: QualityPreference) => void;
 }) => {
   const mediaRef = useRef<HTMLElement | null>(null);
 
@@ -97,6 +103,67 @@ const VideoElement = ({
       stopAndResetMedia(currentEl);
     };
   }, [src, uuid]);
+
+  useEffect(() => {
+    const el = mediaRef.current as any;
+    if (!el) return;
+
+    const renditions = el.videoRenditions;
+    if (!renditions) return;
+
+    const hlsInstance = (el as any).api ?? (el as any).hls;
+    if (!hlsInstance) return;
+
+    // Helper: map current selectedIndex back to height or "auto"
+    const syncFromPlayer = () => {
+      const idx = renditions.selectedIndex;
+      // Conventionally index < 0 (e.g. -1) or a rendition without height means Auto
+      if (typeof idx !== "number" || idx < 0 || !renditions[idx]) {
+        setQuality("auto");
+        return;
+      }
+
+      const active = renditions[idx];
+      const height = active.height ?? active.videoHeight;
+      if (typeof height === "number" && height > 0) {
+        setQuality(height);
+      }
+    };
+
+    // Helper: apply saved preference once renditions exist for the episode
+    const applySavedPreference = () => {
+      if (quality === "auto") {
+        renditions.selectedIndex = -1;
+        hlsInstance.currentLevel = -1;
+        return;
+      }
+
+      for (let i = 0; i < renditions.length; i++) {
+        const r = renditions[i];
+        const h = r?.height ?? r?.videoHeight;
+        if (h === quality) {
+          renditions.selectedIndex = i;
+          hlsInstance.currentLevel = i;
+          return;
+        }
+      }
+      // If this episode doesn't have the saved height, leave Auto / default active
+    };
+
+    // Apply when renditions are added/loaded for a new episode
+    applySavedPreference();
+    el.addEventListener("addrendition", applySavedPreference);
+    el.addEventListener("loadedmetadata", applySavedPreference);
+
+    // Listen for user quality changes on videoRenditions
+    renditions.addEventListener?.("change", syncFromPlayer);
+
+    return () => {
+      el.removeEventListener("addrendition", applySavedPreference);
+      el.removeEventListener("loadedmetadata", applySavedPreference);
+      renditions.removeEventListener?.("change", syncFromPlayer);
+    };
+  }, [src, quality]);
 
   const commonProps = {
     ref: mediaRef as any,
@@ -146,6 +213,7 @@ export const ReleasePlayerCustom = (props: {
   });
   const [playerError, setPlayerError] = useState(null);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [quality, setQuality] = useState<QualityPreference>("auto");
   const [isErrorDetailsOpen, setIsErrorDetailsOpen] = useState(false);
   const [isEpLoadingTimeout, setIsEpLoadingTimeout] = useState(null);
 
@@ -345,6 +413,8 @@ export const ReleasePlayerCustom = (props: {
               defaultPlaybackRate={playbackRate}
               setDefaultPlaybackRate={setPlaybackRate}
               uuid={`player.video.${props.id}.${episode.selected}.${voiceover.selected}.${source.selected}.${playerProps.src}`}
+              quality={quality}
+              setQuality={setQuality}
             ></VideoElement>
           ) : (
             ""
