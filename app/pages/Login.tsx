@@ -32,22 +32,25 @@ export function LoginPage() {
     });
 
     const { data, error } = await tryCatchAPI(
-      fetch(`${ENDPOINTS.user.auth}?login=${login}&password=${password}`, {
-        method: "POST",
-        headers: {
-          Sign: "9aa5c7af74e8cd70c86f7f9587bde23d",
-          "Content-Type": "application/x-www-form-urlencoded",
+      fetch(
+        `${ENDPOINTS.user.auth}?login=${encodeURIComponent(login)}&password=${encodeURIComponent(password)}`,
+        {
+          method: "POST",
+          headers: {
+            Sign: "9aa5c7af74e8cd70c86f7f9587bde23d",
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
         },
-      })
+      ),
     );
 
     if (error) {
-      let message = `Ошибка получения пользователя, code: ${error.code}`
+      let message = `Ошибка получения пользователя, code: ${error.code}`;
       if (error.code == 2) {
-        message = "Такого пользователя не существует"
+        message = "Такого пользователя не существует";
       }
       if (error.code == 3) {
-        message = "Неправильно указан логин и/или пароль"
+        message = "Неправильно указан логин или пароль";
       }
       toast.update(tid, {
         render: message,

@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -19,11 +23,21 @@
     ],
     "baseUrl": "app",
     "paths": {
-      "#/components/*": ["components/*"],
-      "#/api/*": ["api/*"],
-      "#/store/*": ["store/*"],
-      "#/hooks/*": ["hooks/*"],
-      "#/pages/*": ["pages/*"]
+      "#/components/*": [
+        "components/*"
+      ],
+      "#/api/*": [
+        "api/*"
+      ],
+      "#/store/*": [
+        "store/*"
+      ],
+      "#/hooks/*": [
+        "hooks/*"
+      ],
+      "#/pages/*": [
+        "pages/*"
+      ]
     },
     "target": "ES2017"
   },
@@ -35,5 +49,7 @@
     "next.config.mjs",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
