@@ -1,7 +1,7 @@
 "use client";
 
 import Styles from "./MediaPlayer.module.css";
-import { Button, Card } from "flowbite-react";
+import { Button, Card, Dropdown, DropdownItem } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
 import {
   MediaController,
@@ -45,6 +45,9 @@ import {
   saveAnonEpisodeWatched,
 } from "./ReleasePlayer";
 import { usePreferencesStore } from "#/store/preferences";
+import { VoiceoverSelectorDropdown } from "./VoiceoverSelectorDropdown";
+import { SourceSelectorDropdown } from "./SourceSelectorDropdown";
+import { EpisodeSelectorDropdown } from "./EpisodeSelectorDropdown";
 
 type QualityPreference = number | "auto";
 
@@ -111,9 +114,6 @@ const VideoElement = ({
     const renditions = el.videoRenditions;
     if (!renditions) return;
 
-    const hlsInstance = (el as any).api ?? (el as any).hls;
-    if (!hlsInstance) return;
-
     // Helper: map current selectedIndex back to height or "auto"
     const syncFromPlayer = () => {
       const idx = renditions.selectedIndex;
@@ -132,6 +132,9 @@ const VideoElement = ({
 
     // Helper: apply saved preference once renditions exist for the episode
     const applySavedPreference = () => {
+      const hlsInstance = (el as any).api ?? (el as any).hls;
+      if (!hlsInstance) return;
+
       if (quality === "auto") {
         renditions.selectedIndex = -1;
         hlsInstance.currentLevel = -1;
@@ -496,26 +499,33 @@ export const ReleasePlayerCustom = (props: {
           <div className={`${Styles["anime-title"]}`}>
             <div className="flex flex-col gap-2">
               <p className="text-xl text-white">{props.title}</p>
-              <div className="flex gap-2">
-                {voiceover.selected ? (
-                  <p className="text-base font-light leading-none text-gray-200">
-                    {voiceover.selected.name}
-                  </p>
-                ) : (
-                  ""
-                )}
-                {episode.selected ? (
-                  <p className="text-base font-light leading-none text-gray-200">
-                    |{" "}
-                    {episode.selected.name
-                      ? episode.selected.name
-                      : ["Sibnet"].includes(source.selected.name)
-                        ? `${episode.selected.position + 1} Серия`
-                        : `${episode.selected.position} Серия`}
-                  </p>
-                ) : (
-                  ""
-                )}
+              <div className="flex gap-1">
+                <VoiceoverSelectorDropdown
+                  release_id={props.id}
+                  token={props.token}
+                  voiceover={voiceover.selected}
+                  voiceoverList={voiceover.available}
+                  setVoiceover={setVoiceover}
+                  setPlayerError={setPlayerError}
+                />
+                <SourceSelectorDropdown
+                  release_id={props.id}
+                  voiceover={voiceover.selected}
+                  source={source.selected}
+                  sourceList={source.available}
+                  setSource={setSource}
+                  setPlayerError={setPlayerError}
+                />
+                <EpisodeSelectorDropdown
+                  release_id={props.id}
+                  token={props.token}
+                  voiceover={voiceover.selected}
+                  source={source.selected}
+                  episode={episode.selected}
+                  episodeList={episode.available}
+                  setEpisode={setEpisode}
+                  setPlayerError={setPlayerError}
+                />
               </div>
             </div>
           </div>
@@ -549,6 +559,7 @@ export const ReleasePlayerCustom = (props: {
               </MediaRenditionMenu>
             </MediaSettingsMenuItem>
           </MediaSettingsMenu>
+          {/*
           <MediaChromeDialog
             id="source"
             className={`${Styles["media-source-dialog"]}`}
@@ -590,6 +601,7 @@ export const ReleasePlayerCustom = (props: {
               <p>Выбор доступен только в горизонтальном режиме</p>
             </div>
           </MediaChromeDialog>
+        */}
           <MediaControlBar className={`${Styles["media-control-bar"]}`}>
             <MediaChromeButton
               className={`${Styles["media-button"]} w-[calc(2*var(--base))] z-[2]`}
@@ -781,6 +793,7 @@ export const ReleasePlayerCustom = (props: {
                 />
               </svg>
             </MediaSeekForwardButton>
+            {/*
             <MediaSettingsMenuButton
               className={`${Styles["media-button"]}`}
               {...({ invoketarget: "source" } as any)}
@@ -806,6 +819,7 @@ export const ReleasePlayerCustom = (props: {
                 </g>
               </svg>
             </MediaSettingsMenuButton>
+            */}
             <MediaSettingsMenuButton
               className={`${Styles["media-button"]} ${Styles["media-settings-menu-button"]}`}
             >
