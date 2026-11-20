@@ -206,6 +206,7 @@ export const ProfileEditModal = (props: {
   return (
     <>
       <Modal
+        dismissible
         show={props.isOpen}
         onClose={() => props.setIsOpen(false)}
         size={"7xl"}

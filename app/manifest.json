@@ -5,8 +5,8 @@
   "background_color": "#fff",
   "display": "standalone",
   "orientation": "",
-  "scope": "/",
-  "start_url": "/",
+  "scope": ".",
+  "start_url": ".",
   "lang": "ru",
   "icons": [
     {
@@ -63,7 +63,7 @@
   "shortcuts" : [
     {
       "name": "Поиск",
-      "url": "/search",
+      "url": "search",
       "description": "Найти аниме",
       "icons": [
         {
@@ -80,7 +80,7 @@
     },
     {
       "name": "Закладки",
-      "url": "/bookmarks",
+      "url": "bookmarks",
       "description": "Ваши закладки",
       "icons": [
         {
@@ -97,7 +97,7 @@
     },
     {
       "name": "Избранное",
-      "url": "/favorites",
+      "url": "favorites",
       "description": "Избранные аниме",
       "icons": [
         {

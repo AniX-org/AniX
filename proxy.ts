@@ -6,7 +6,7 @@ export const config = {
   matcher: "/api/proxy/:path*",
 };
 
-export default async function middleware(
+export default async function proxy(
   request: Request,
   context: NextFetchEvent
 ) {

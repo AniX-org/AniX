@@ -7,7 +7,7 @@ export async function generateMetadata(
   { params },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id: string = params.id;
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
     `${API_URL}/profile/${id}`
   );
@@ -38,6 +38,6 @@ export async function generateMetadata(
 }
 
 export default async function Profile({ params }) {
-  const id: string = params.id;
+  const { id } = await params;
   return <ProfilePage id={id} />;
 }

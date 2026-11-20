@@ -7,7 +7,7 @@ export async function generateMetadata(
   { params },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
     `${API_URL}/release/${id}`
   );
@@ -39,6 +39,6 @@ export async function generateMetadata(
 }
 
 export default async function Search({ params }) {
-  const id = params.id;
+  const { id } = await params;
   return <ReleasePage id={id} />;
 }

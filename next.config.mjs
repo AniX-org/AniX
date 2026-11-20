@@ -3,7 +3,11 @@ import withFlowbiteReact from "flowbite-react/plugin/nextjs";
 /** @type {import('next').NextConfig} */
 const NextConfig = {
   output: "standalone",
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
   reactStrictMode: false,
+  experimental: {
+    cpus: 1,
+  },
   images: {
     unoptimized: true,
   },

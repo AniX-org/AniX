@@ -1,4 +1,4 @@
-FROM node:23-alpine AS base
+FROM node:24-alpine AS base
 
 
 FROM base AS deps
@@ -12,6 +12,7 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+ARG NEXT_PUBLIC_BASE_PATH
 ARG NEXT_PUBLIC_PLAYER_PARSER_URL=BAKED_NEXT_PUBLIC_PLAYER_PARSER_URL
 ARG NEXT_PUBLIC_API_URL=BAKED_NEXT_PUBLIC_API_URL
 ARG NEXT_PUBLIC_SHARE_PREFIX=BAKED_NEXT_PUBLIC_SHARE_PREFIX
@@ -21,18 +22,18 @@ RUN npm run build
 
 
 FROM base AS runner
-LABEL org.opencontainers.image.source=https://github.com/radiquum/anix
+ARG NEXT_PUBLIC_BASE_PATH
+LABEL org.opencontainers.image.source=https://github.com/AniX-org/AniX
 RUN apk add --no-cache bash
 WORKDIR /app
 COPY ./scripts ./scripts
 RUN chmod +x ./scripts/replace-build-env.sh
 RUN chmod +x ./scripts/start.sh
 ENV NODE_ENV=production
+ENV NEXT_PUBLIC_BASE_PATH=${NEXT_PUBLIC_BASE_PATH}
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
-COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 USER nextjs
 
 EXPOSE 3000

@@ -16,6 +16,7 @@ import { Bounce, ToastContainer } from "react-toastify";
 import { NavBarPc } from "./components/Navbar/NavBarPc";
 import { NavBarMobile } from "./components/Navbar/NavBarMobile";
 import { SettingsModal } from "./components/SettingsModal/SettingsModal";
+import { BASE_PATH } from "./api/config";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +33,7 @@ export const App = (props) => {
 
   useEffect(() => {
     async function _checkVersion() {
-      const res = await fetch("/api/version");
+      const res = await fetch(`${BASE_PATH}/api/version`);
       const data = await res.json();
 
       if (data.version !== preferencesStore.params.version) {

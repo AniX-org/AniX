@@ -2,6 +2,7 @@
 
 ## Available environment variables
 
+- NEXT_PUBLIC_BASE_PATH (path prefix, for example `/anixart`; set it before the build without a trailing `/`)
 - NEXT_PUBLIC_PLAYER_PARSER_URL ([player-parser](https://github.com/AniX-org/anix-player-parser) subservice, if deployed)
 - NEXT_PUBLIC_API_URL ([api-prox](https://github.com/AniX-org/anix-api-prox) subservice, if deployed)
 - NEXT_PUBLIC_SHARE_PREFIX ([anix-preview](https://github.com/AniX-org/anix-preview) subservice, if deployed, leave default to use official link preview)
@@ -126,6 +127,8 @@ Additional Requirements:
 
 > [!NOTE]
 > HINT: you need to use `-e VARIABLE=VALUE` before the last word anix, to set the environment variables for docker deployment
+>
+> Set `NEXT_PUBLIC_BASE_PATH` during a manual build: `docker build --build-arg NEXT_PUBLIC_BASE_PATH=/anixart -t anix .`
 
 [Available environment variables](#available-environment-variables)
 
@@ -148,36 +151,33 @@ Useful links:
 
 Requirements:
 
-- [git](https://git-scm.com/)
-- [nodejs 23+ with npm](http://nodejs.org/)
+- [Node.js 24 LTS with npm](https://nodejs.org/)
 - [pm2](https://pm2.keymetrics.io/)
 
-Instructions:
+If you use nvm, running `nvm install` in the project directory installs and immediately activates the version from `.nvmrc`.
 
-1. Clone the repository `git clone https://github.com/Radiquum/AniX`
-2. Navigate to the repository directory `cd AniX`
-3. Run the command `npm install`
-4. (optional) copy `.env.sample` as `.env` and fill it with variables from [Available environment variables](#available-environment-variables)
-5. Run the command `npm run build`
-6. Create a new directory (next we will be refer to its name as `<new_dir>`)
-7. Move the following files into the new directory (`<new_dir>`):
-    - move `public` directory to `<new_dir>/public`
-    - move `.next/static` directory to `<new_dir>/.next/static`
-    - move files from `.next/standalone` to `<new_dir>`
-8. Move into the created directory (<new_dir>) and run the command `pm2 start server.js -n anix`
+```bash
+git clone https://github.com/AniX-org/AniX.git
+cd AniX
+npm ci
+npm run build
+pm2 start .next/standalone/server.js --name anix
+```
 
-### pm2/Flags
+For custom settings, copy `.env.sample` to `.env` and fill in the [environment variables](#available-environment-variables) before running `npm run build`.
 
-- -n - service name in pm2
+Use `npm ci` to install the versions from `package-lock.json`. Do not run `npm audit fix --force`: it can replace dependencies with incompatible major versions and break the build.
 
 ### pm2/After deployment
 
 The service will be available at: `http://<YOUR IP>:3000/`
 
-### pm2/Note
+The defaults are `HOSTNAME=0.0.0.0` and `PORT=3000`. Set them before `pm2 start` only when a different address or port is required.
 
-To enable automatic application startup, it is recommended to configure pm2 to start on boot using the command: `pm2 startup`
+### pm2/Start after reboot
 
-Useful links:
+This is not required for the initial application start. To enable it:
 
-- [PM2: managing processes smartly @ Habr](https://habr.com/ru/articles/480670/)
+1. Run `pm2 startup`.
+2. Run the command printed by PM2.
+3. Save the current process list with `pm2 save`.

@@ -7,7 +7,7 @@ export async function generateMetadata(
   { params },
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  const id = params.id;
+  const { id } = await params;
   const { data, error } = await fetchDataViaGet(
     `${API_URL}/collection/${id}`
   );
@@ -41,5 +41,6 @@ export async function generateMetadata(
 }
 
 export default async function Collections({ params }) {
-  return <ViewCollectionPage id={params.id} />;
+  const { id } = await params;
+  return <ViewCollectionPage id={id} />;
 }
