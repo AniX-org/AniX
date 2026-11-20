@@ -2,7 +2,7 @@
 
 import Styles from "./MediaPlayer.module.css";
 import { Button, Card } from "flowbite-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MediaController,
   MediaControlBar,
@@ -52,68 +52,70 @@ const VideoElement = ({
   poster,
   defaultPlaybackRate,
   setDefaultPlaybackRate,
+  uuid,
 }: {
   type: "hls" | "mp4" | null;
   src: string | null;
   poster: string | null;
   defaultPlaybackRate: number;
-  setDefaultPlaybackRate: (state) => void;
+  setDefaultPlaybackRate: (state: number) => void;
+  uuid: string;
 }) => {
-  const [el, setEl] = useState(null);
-  const [elPrev, setElPrev] = useState(null);
+  const mediaRef = useRef<HTMLElement | null>(null);
 
-  useEffect(() => {
-    if (document) {
-      setEl(document.getElementById("video-element"));
+  const stopAndResetMedia = (el: HTMLElement | null) => {
+    if (!el) return;
+
+    // If HLS exposes an underlying hls.js instance, stop loading & destroy cleanly
+    const hlsInstance = (el as any).api ?? (el as any).hls;
+    if (hlsInstance) {
+      hlsInstance.stopLoad?.();
+      hlsInstance.detachMedia?.();
+      hlsInstance.destroy?.();
     }
-  }, [src]);
 
-  useEffect(() => {
-    setElPrev(el);
-    // sourcery skip: merge-nested-ifs
-    if (elPrev) {
-      if (elPrev.tagName == "HLS-VIDEO") {
-        elPrev.api.detachMedia();
-      }
+    // Also handle underlying HTMLVideoElement if present (or if el itself is <video>)
+    const videoEl: HTMLVideoElement | null =
+      el.tagName === "VIDEO"
+        ? (el as HTMLVideoElement)
+        : (el.querySelector?.("video") ?? (el as any).nativeEl ?? null);
+
+    if (videoEl) {
+      videoEl.pause();
+      videoEl.removeAttribute("src");
+      videoEl
+        .querySelectorAll("source")
+        .forEach((s) => s.removeAttribute("src"));
+      videoEl.load();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [el]);
+  };
 
-  return (
-    <>
-      {type == "hls" ?
-        <HlsVideo
-          className={"object-contain h-full aspect-video"}
-          src={src}
-          poster={poster}
-          slot="media"
-          id="video-element"
-          defaultPlaybackRate={defaultPlaybackRate}
-          onRateChangeCapture={(e) =>
-            // @ts-ignore
-            setDefaultPlaybackRate(e.target.playbackRate || 1)
-          }
-        />
-      : type == "mp4" ?
-        <VideoJS
-          className={"object-contain h-full aspect-video"}
-          src={src}
-          poster={poster}
-          slot="media"
-          id="video-element"
-          defaultPlaybackRate={defaultPlaybackRate}
-          onRateChangeCapture={(e) =>
-            // @ts-ignore
-            setDefaultPlaybackRate(e.target.playbackRate || 1)
-          }
-        />
-      : <video
-          className={"object-contain h-full aspect-video"}
-          slot="media"
-        ></video>
-      }
-    </>
-  );
+  // Stop previous media when src or uuid changes, or on unmount
+  useEffect(() => {
+    const currentEl = mediaRef.current;
+    return () => {
+      stopAndResetMedia(currentEl);
+    };
+  }, [src, uuid]);
+
+  const commonProps = {
+    ref: mediaRef as any,
+    className: "object-contain h-full aspect-video",
+    slot: "media",
+    defaultPlaybackRate,
+    onRateChangeCapture: (e: React.SyntheticEvent<HTMLElement>) =>
+      setDefaultPlaybackRate((e.target as HTMLVideoElement).playbackRate || 1),
+  };
+
+  if (type === "hls") {
+    return <HlsVideo {...commonProps} key={uuid} src={src} poster={poster} />;
+  }
+
+  if (type === "mp4") {
+    return <VideoJS {...commonProps} key={uuid} src={src} poster={poster} />;
+  }
+
+  return <video {...commonProps} key={uuid} />;
 };
 
 export const ReleasePlayerCustom = (props: {
@@ -158,7 +160,7 @@ export const ReleasePlayerCustom = (props: {
       if (source.selected.name == "Kodik") {
         const { manifest, poster } = await _fetchKodikManifest(
           episode.selected.url,
-          setPlayerError
+          setPlayerError,
         );
         if (manifest) {
           SetPlayerProps({
@@ -173,7 +175,7 @@ export const ReleasePlayerCustom = (props: {
       if (["anixart.libria.fun"].includes(hostname)) {
         const { manifest, poster } = await _fetchAnilibriaManifest(
           episode.selected.url,
-          setPlayerError
+          setPlayerError,
         );
         if (manifest) {
           SetPlayerProps({
@@ -188,7 +190,7 @@ export const ReleasePlayerCustom = (props: {
       if (["video.sibnet.ru"].includes(hostname)) {
         const { manifest, poster } = await _fetchSibnetManifest(
           episode.selected.url,
-          setPlayerError
+          setPlayerError,
         );
         if (manifest) {
           SetPlayerProps({
@@ -233,7 +235,7 @@ export const ReleasePlayerCustom = (props: {
       setIsEpLoadingTimeout(
         setTimeout(() => {
           __getInfo();
-        }, 250)
+        }, 250),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -252,7 +254,7 @@ export const ReleasePlayerCustom = (props: {
       const anonEpisodesWatched = getAnonEpisodesWatched(
         props.id,
         source.selected.id,
-        voiceover.selected.id
+        voiceover.selected.id,
       );
       if (
         preferenceStore.flags.saveWatchHistory &&
@@ -260,12 +262,12 @@ export const ReleasePlayerCustom = (props: {
         !Object.keys(
           anonEpisodesWatched[props.id][source.selected.id][
             voiceover.selected.id
-          ]
+          ],
         ).includes(episode.selected.position.toString())
       ) {
         const objectToReplace = episode.available.find(
           (arrayItem: Episode) =>
-            arrayItem.position === episode.selected.position
+            arrayItem.position === episode.selected.position,
         );
         const newObject = {
           ...episode.selected,
@@ -276,14 +278,14 @@ export const ReleasePlayerCustom = (props: {
           props.id,
           source.selected.id,
           voiceover.selected.id,
-          episode.selected.position
+          episode.selected.position,
         );
         if (props.token) {
           fetch(
-            `${ENDPOINTS.statistic.addHistory}/${props.id}/${source.selected.id}/${episode.selected.position}?token=${props.token}`
+            `${ENDPOINTS.statistic.addHistory}/${props.id}/${source.selected.id}/${episode.selected.position}?token=${props.token}`,
           );
           fetch(
-            `${ENDPOINTS.statistic.markWatched}/${props.id}/${source.selected.id}/${episode.selected.position}?token=${props.token}`
+            `${ENDPOINTS.statistic.markWatched}/${props.id}/${source.selected.id}/${episode.selected.position}?token=${props.token}`,
           );
         }
       }
@@ -294,7 +296,7 @@ export const ReleasePlayerCustom = (props: {
     if (!episode.available || !episode.selected) return;
 
     const curEpIdx = episode.available.findIndex(
-      (el) => el.position == episode.selected.position
+      (el) => el.position == episode.selected.position,
     );
 
     if (curEpIdx == -1 || curEpIdx == 0 || episode.available.length == 0)
@@ -310,7 +312,7 @@ export const ReleasePlayerCustom = (props: {
     if (!episode.available || !episode.selected) return;
 
     const curEpIdx = episode.available.findIndex(
-      (el) => el.position == episode.selected.position
+      (el) => el.position == episode.selected.position,
     );
 
     if (
@@ -335,16 +337,19 @@ export const ReleasePlayerCustom = (props: {
           className={`relative w-full overflow-hidden ${Styles["media-controller"]}`}
           onPlayCapture={() => saveEpisodeToHistory()}
         >
-          {playerProps.type != null && playerProps.src != null ?
+          {playerProps.type != null && playerProps.src != null ? (
             <VideoElement
               type={playerProps.type}
               src={playerProps.src}
               poster={playerProps.poster}
               defaultPlaybackRate={playbackRate}
               setDefaultPlaybackRate={setPlaybackRate}
+              uuid={`player.video.${props.id}.${episode.selected}.${voiceover.selected}.${source.selected}.${playerProps.src}`}
             ></VideoElement>
-          : ""}
-          {playerProps.type == null || playerProps.src == null ?
+          ) : (
+            ""
+          )}
+          {playerProps.type == null || playerProps.src == null ? (
             <>
               <video
                 className={"object-contain h-full aspect-video"}
@@ -372,19 +377,21 @@ export const ReleasePlayerCustom = (props: {
                 </svg>
               )}
             </>
-          : !playerError ?
+          ) : !playerError ? (
             <MediaLoadingIndicator
               slot="centered-chrome"
               noAutohide
             ></MediaLoadingIndicator>
-          : ""}
+          ) : (
+            ""
+          )}
 
-          {playerError ?
+          {playerError ? (
             <>
               <div className="absolute inset-0 w-full h-full bg-black bg-opacity-75 backdrop-blur-lg"></div>
               <div slot="centered-chrome" className="flex flex-col gap-4 z-[2]">
                 <p className="text-lg font-bold">{playerError.message}</p>
-                {!isErrorDetailsOpen ?
+                {!isErrorDetailsOpen ? (
                   <Button
                     color="light"
                     size="xs"
@@ -392,11 +399,12 @@ export const ReleasePlayerCustom = (props: {
                   >
                     Подробнее
                   </Button>
-                : <p className="font-light text-gray-100">
+                ) : (
+                  <p className="font-light text-gray-100">
                     {playerError.detail}
                   </p>
-                }
-                {voiceover.selected && source.selected && episode.selected ?
+                )}
+                {voiceover.selected && source.selected && episode.selected ? (
                   <Button
                     color="light"
                     size="xs"
@@ -404,10 +412,14 @@ export const ReleasePlayerCustom = (props: {
                   >
                     Повторить
                   </Button>
-                : ""}
+                ) : (
+                  ""
+                )}
               </div>
             </>
-          : ""}
+          ) : (
+            ""
+          )}
 
           <div className={`${Styles["media-gradient-top"]}`}></div>
 
@@ -415,21 +427,25 @@ export const ReleasePlayerCustom = (props: {
             <div className="flex flex-col gap-2">
               <p className="text-xl text-white">{props.title}</p>
               <div className="flex gap-2">
-                {voiceover.selected ?
+                {voiceover.selected ? (
                   <p className="text-base font-light leading-none text-gray-200">
                     {voiceover.selected.name}
                   </p>
-                : ""}
-                {episode.selected ?
+                ) : (
+                  ""
+                )}
+                {episode.selected ? (
                   <p className="text-base font-light leading-none text-gray-200">
                     |{" "}
-                    {episode.selected.name ?
-                      episode.selected.name
-                    : ["Sibnet"].includes(source.selected.name) ?
-                      `${episode.selected.position + 1} Серия`
-                    : `${episode.selected.position} Серия`}
+                    {episode.selected.name
+                      ? episode.selected.name
+                      : ["Sibnet"].includes(source.selected.name)
+                        ? `${episode.selected.position + 1} Серия`
+                        : `${episode.selected.position} Серия`}
                   </p>
-                : ""}
+                ) : (
+                  ""
+                )}
               </div>
             </div>
           </div>
@@ -494,9 +510,11 @@ export const ReleasePlayerCustom = (props: {
                 setEpisode={setEpisode}
                 setPlayerError={setPlayerError}
               />
-              {!voiceover.selected && !source.selected && !episode.selected ?
+              {!voiceover.selected && !source.selected && !episode.selected ? (
                 <p>Нет доступных вариантов для выбора</p>
-              : ""}
+              ) : (
+                ""
+              )}
             </div>
             <div className="sm:hidden">
               <p>Выбор доступен только в горизонтальном режиме</p>
