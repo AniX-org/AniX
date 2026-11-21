@@ -1,5 +1,8 @@
 "use client";
 
+// TODO: Fallback to iframe player if player is unsuported\error occured
+// TODO: Refactor player support and link/manifest getting via openanix-serverless-backend & proxy.ts (player shouldn't do all that stuff itself)
+
 import Styles from "./MediaPlayer.module.css";
 import { Button, Card, Dropdown, DropdownItem } from "flowbite-react";
 import { useEffect, useRef, useState } from "react";
