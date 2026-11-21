@@ -58,8 +58,9 @@ Please note that AniX is an unofficial project and is not affiliated with the de
 > [!WARNING]
 > I don't responsible for your account, use the public instances at your discretion, otherwise deploy one yourself!
 
-- https://anixart.netlify.app/ (No sub-services)
-- https://anix.0x174.su/ (Full deploy, Login: anime, Pass: just_watch)
+- https://anixart.netlify.app (No sub-services)
+- http://anix.nl.0x174.dev (Full deploy, Login: anime, Pass: just_watch)
+- https://anix.mipoh.gay (Full deploy)
 
 ## Contributing
 
