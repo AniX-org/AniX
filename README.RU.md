@@ -58,8 +58,9 @@ AniX - это неофициальный веб-клиент для Android-пр
 > [!WARNING]
 > Я не несу ответственности за ваш аккаунт, используйте публичные инстансы на свой риск, иначе деплойте свой!
 
-- https://anixart.netlify.app/ (Без доп. сервисов)
-- https://anix.wowlikon.tech/ (Полный деплой, Логин: anime, Пароль: just_watch)
+- https://anixart.netlify.app (Без доп. сервисов)
+- http://anix.nl.0x174.dev (Полный деплой, Логин: anime, Пароль: just_watch)
+- https://anix.mipoh.gay
 
 ## Внесение вклада
 
