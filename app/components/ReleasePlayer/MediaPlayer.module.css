@@ -55,17 +55,37 @@
   --media-tooltip-distance: 8px;
   --media-tooltip-container-margin: 18px;
   position: relative;
+  width: var(--media-control-height, calc(2 * var(--base)));
+  flex-shrink: 1;
   padding: 0;
   opacity: 0.9;
-  transition: opacity 0.1s cubic-bezier(0.4, 0, 1, 1);
+  border-radius: 25%;
+  backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
+  -webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
+  transition:
+    opacity 0.1s cubic-bezier(0.4, 0, 1, 1),
+    backdrop-filter 0.3s,
+    -webkit-backdrop-filter 0.3s,
+    box-shadow 0.3s;
+}
+
+.media-button:hover {
+  /* background-color: rgba(0, 0, 0, 0.05); */
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px;
+  /* hue-rotate(120deg) */
+  backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
+  -webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
+  transition:
+    backdrop-filter 0.3s,
+    -webkit-backdrop-filter 0.3s;
 }
 
 .svg {
   fill: none;
   stroke: var(--_primary-color, #fff);
   stroke-width: 1;
-  stroke-linecap: "round";
-  stroke-linejoin: "round";
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .svg .svg-shadow {
@@ -247,27 +267,6 @@
   100% {
     transform: scale(1, 1);
   }
-}
-
-.media-button {
-  border-radius: 25%;
-  backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
-  -webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(0);
-  transition:
-    backdrop-filter 0.3s,
-    -webkit-backdrop-filter 0.3s,
-    box-shadow 0.3s;
-}
-
-.media-button:hover {
-  /* background-color: rgba(0, 0, 0, 0.05); */
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px;
-  /* hue-rotate(120deg) */
-  backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
-  -webkit-backdrop-filter: blur(10px) invert(15%) brightness(80%) opacity(1);
-  transition:
-    backdrop-filter 0.3s,
-    -webkit-backdrop-filter 0.3s;
 }
 
 .media-play-button .icon-play {

@@ -135,21 +135,26 @@ const VideoElement = ({
       const hlsInstance = (el as any).api ?? (el as any).hls;
       if (!hlsInstance) return;
 
-      if (quality === "auto") {
-        renditions.selectedIndex = -1;
-        hlsInstance.currentLevel = -1;
-        return;
-      }
+      try {
+        if (hlsInstance && "currentLevel" in hlsInstance) {
+          if (quality === "auto") {
+            renditions.selectedIndex = -1;
+            hlsInstance.currentLevel = -1;
+            return;
+          }
 
-      for (let i = 0; i < renditions.length; i++) {
-        const r = renditions[i];
-        const h = r?.height ?? r?.videoHeight;
-        if (h === quality) {
-          renditions.selectedIndex = i;
-          hlsInstance.currentLevel = i;
-          return;
+          for (let i = 0; i < renditions.length; i++) {
+            const r = renditions[i];
+            const h = r?.height ?? r?.videoHeight;
+            if (h === quality) {
+              renditions.selectedIndex = i;
+              hlsInstance.currentLevel = i;
+              return;
+            }
+          }
         }
-      }
+      } catch {}
+
       // If this episode doesn't have the saved height, leave Auto / default active
     };
 
@@ -498,7 +503,7 @@ export const ReleasePlayerCustom = (props: {
 
           <div className={`${Styles["anime-title"]}`}>
             <div className="flex flex-col gap-2">
-              <p className="text-xl text-white">{props.title}</p>
+              <p className="text-sm text-white">{props.title}</p>
               <div className="flex gap-1">
                 <VoiceoverSelectorDropdown
                   release_id={props.id}
@@ -604,13 +609,26 @@ export const ReleasePlayerCustom = (props: {
         */}
           <MediaControlBar className={`${Styles["media-control-bar"]}`}>
             <MediaChromeButton
-              className={`${Styles["media-button"]} w-[calc(2*var(--base))] z-[2]`}
+              className={`${Styles["media-button"]} z-[2]`}
               onClick={() => _prevEpisode()}
             >
               <div slot="tooltip-content">Предыдущая серия</div>
-              <span
-                className={`${Styles["svg"]} iconify solar--skip-previous-outline w-[calc(0.9*var(--base))] h-[calc(0.9*var(--base))]`}
-              ></span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                {...({ slot: "" } as any)}
+                className={`${Styles["svg"]}`}
+                width="24"
+                height="24"
+                viewBox="-18 -18 60 60"
+              >
+                <path
+                  fill="currentColor"
+                  fillRule="evenodd"
+                  d="M21.1392 1.80371C22.1058 2.46477 22.75 3.64507 22.75 5.03297V18.9672C22.75 20.3551 22.1058 21.5354 21.1392 22.1965C20.1604 22.8659 18.8652 22.9827 17.7223 22.2447L6.93329 15.2775C5.78297 14.5347 5.25 13.2342 5.25 12.0001C5.25 10.7659 5.78297 9.46544 6.93329 8.72261L17.7223 1.7555C18.8652 1.01747 20.1604 1.13428 21.1392 1.80371ZM20.2924 3.04182C19.7699 2.68448 19.1298 2.63219 18.536 3.0156L7.74702 9.98271C7.11047 10.3938 6.75 11.1637 6.75 12.0001C6.75 12.8364 7.11047 13.6064 7.74701 14.0174L18.536 20.9846C19.1298 21.368 19.7699 21.3157 20.2924 20.9583C20.8271 20.5926 21.25 19.8885 21.25 18.9672V5.03297C21.25 4.11167 20.8271 3.40753 20.2924 3.04182ZM2 4.25008C2.41421 4.25008 2.75 4.58586 2.75 5.00008V19.0001C2.75 19.4143 2.41421 19.7501 2 19.7501C1.58579 19.7501 1.25 19.4143 1.25 19.0001V5.00008C1.25 4.58586 1.58579 4.25008 2 4.25008Z"
+                  clipRule="evenodd"
+                  strokeWidth={0}
+                />
+              </svg>
             </MediaChromeButton>
             <MediaPlayButton
               mediaPaused={true}
@@ -657,13 +675,30 @@ export const ReleasePlayerCustom = (props: {
               </svg>
             </MediaPlayButton>
             <MediaChromeButton
-              className={`${Styles["media-button"]} w-[calc(2*var(--base))] z-[2]`}
+              className={`${Styles["media-button"]}`}
               onClick={() => _nextEpisode()}
             >
               <div slot="tooltip-content">Следующая серия</div>
-              <span
-                className={`${Styles["svg"]} iconify solar--skip-next-outline w-[calc(0.9*var(--base))] h-[calc(0.9*var(--base))]`}
-              ></span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                {...({ slot: "" } as any)}
+                className={`${Styles["svg"]}`}
+                width="24"
+                height="24"
+                viewBox="-18 -18 60 60"
+              >
+                <path
+                  fill="currentColor"
+                  fillRule="evenodd"
+                  d="M6.27769 1.7555C5.1348 1.01747 3.83955 1.13428 2.86078 1.80371C1.89423 2.46477 1.25 3.64507 1.25 5.03297V18.9672C1.25 20.3551 1.89423 21.5354 2.86078 22.1965C3.83956 22.8659 5.1348 22.9827 6.2777 22.2447L17.0667 15.2775C18.217 14.5347 18.75 13.2342 18.75 12.0001C18.75 10.7659 18.217 9.46544 17.0667 8.72261L6.27769 1.7555ZM2.75 5.03297C2.75 4.11167 3.17287 3.40753 3.70757 3.04182C4.23005 2.68448 4.87022 2.63219 5.46397 3.0156L16.253 9.98271C16.8895 10.3938 17.25 11.1637 17.25 12.0001C17.25 12.8364 16.8895 13.6064 16.253 14.0174L5.46397 20.9846C4.87023 21.368 4.23005 21.3157 3.70758 20.9583C3.17287 20.5926 2.75 19.8885 2.75 18.9672L2.75 5.03297Z"
+                  clipRule="evenodd"
+                  strokeWidth={0}
+                />
+                <path
+                  fill="currentColor"
+                  d="M22.75 5.00008C22.75 4.58586 22.4142 4.25008 22 4.25008C21.5858 4.25008 21.25 4.58586 21.25 5.00008V19.0001C21.25 19.4143 21.5858 19.7501 22 19.7501C22.4142 19.7501 22.75 19.4143 22.75 19.0001V5.00008Z"
+                />
+              </svg>
             </MediaChromeButton>
             <MediaMuteButton
               className={`${Styles["media-button"]} ${Styles["media-mute-button"]}`}
@@ -736,7 +771,7 @@ export const ReleasePlayerCustom = (props: {
                   fill="none"
                   stroke="currentColor"
                   strokeLinecap="round"
-                  strokeWidth="1.5"
+                  strokeWidth="1"
                 >
                   <path
                     strokeLinejoin="round"
@@ -764,7 +799,7 @@ export const ReleasePlayerCustom = (props: {
                   fill="none"
                   stroke="currentColor"
                   strokeLinecap="round"
-                  strokeWidth="1.5"
+                  strokeWidth="1"
                 >
                   <path
                     strokeLinejoin="round"
